@@ -1,16 +1,22 @@
 import pandas as pd
 import argparse
+import math
 from round0 import round0
+from round1 import round1
+
+comps = [round0, round1]
 
 parser = argparse.ArgumentParser()
 parser.add_argument("infile")
 parser.add_argument("tiebreak")
 parser.add_argument("scorecol_label")
+parser.add_argument("round", type=int)
 args = parser.parse_args()
 
 infile = args.infile
 tiebreak = args.tiebreak
 scorecol_label = args.scorecol_label
+comp = comps[args.round]
 
 df = pd.read_csv(infile, low_memory=False)
 with open(tiebreak, 'r') as tb:
@@ -20,7 +26,7 @@ n_players = df.shape[0]
 score = [0] * n_players
 for i in range(n_players):
     for j in range(i):
-        x, y = round0(df['Submission'][i], df['Submission'][j])
+        x, y = comp(df['Submission'][i], df['Submission'][j])
         score[i] += x
         score[j] += y
 
@@ -59,23 +65,23 @@ tb.close()
 df['Rank'] = ranks
 
 print(
-    "\\begin\{center\}",
-    "\t\\begin\{tabular\}\{c c c c\} \\\\",
-    "\t\t& Name & Submission & {scorecol_label} \\\\ \hline",
+    "\\begin{center}",
+    "\t\\begin{tabular}{c c c c} \\\\",
+    f"\t\t& Name & Submission & {scorecol_label} \\\\ \hline",
     sep='\n'
 )
 
 for idx, row in df.iterrows():
     rank, name, score, sub = row['Rank'], row['Name'], row['Score'], row['Submission']
-    if rank <= (n_players+1) // 2: #ceil(n/2)
+    if rank <= math.ceil(0.5 * n_players):
         print(f"\t\t{rank} & \\textbf{{{name}}} & {sub} & {score} \\\\")
     else:
         print(f"\t\t{rank} & & {sub} & {score} \\\\")
 
 print(
-    "\t\end\{tabular\}",
-    "\end{\center\}",
+    "\t\\end{tabular}",
+    "\\end{center}",
     sep='\n'
 )
 
-print(df.to_string())
+# print(df.to_string())
