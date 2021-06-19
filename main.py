@@ -3,8 +3,11 @@ import argparse
 import math
 from round0 import round0
 from round1 import round1
+from round2 import round2
+from round3 import round3
+from round4 import round4
 
-comps = [round0, round1]
+comps = [round0, round1, round2, round3, round4]
 
 parser = argparse.ArgumentParser()
 parser.add_argument("infile")
@@ -83,5 +86,3 @@ print(
     "\\end{center}",
     sep='\n'
 )
-
-# print(df.to_string())
